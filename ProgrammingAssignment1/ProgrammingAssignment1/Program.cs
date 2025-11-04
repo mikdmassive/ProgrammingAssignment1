@@ -185,6 +185,8 @@ void SaveAllMatches()
 }
 void Initialise()
 {
+    Users.Clear();
+    Matches.Clear();
     //user
     if (File.Exists(userdatafile))
     {
@@ -248,6 +250,39 @@ void LogIn()
         Console.WriteLine("Account Not Found.");
     }
 }
+void PayoutBetsOnMatch(Match match)
+{
+    if (File.Exists(matchesfile) && File.Exists(matchesfile))
+    {
+        if (!match.isFinished)
+        {
+            match.isFinished = true;
+            foreach(User user in Users)
+            {
+                foreach(Bet bet in user.Bets)
+                {
+                    Match betmatch = bet.GetMatch(Matches);
+                    if (betmatch==match)
+                    {
+                        //Correct match
+                        float payout = bet.BetResultCalculator(match);
+                        Console.WriteLine($"Paid {payout} to {user.username}");
+                        user.balance += payout;
+                    }
+                }
+            }
+            SaveAllMatches();
+            SaveAllUsers();
+        }
+    }
+    else
+    {
+        Console.WriteLine("File error, fixing...");
+        CheckOrCreateFiles();
+        Console.WriteLine("Fixed!");
+    }
+    
+}
 void CreateMatch()
 {
     string team1 = Prompt("Enter the name of Team 1:");
@@ -256,13 +291,46 @@ void CreateMatch()
     Matches.Add(match);
     SaveAllMatches();
 }
+void PostResults()
+{
+    Console.WriteLine("AVALIABLE MATCHES\n==========");
+    Dictionary<string, Match> activeMatches = new Dictionary<string, Match>();
+    int indexer = 0;
+    for (int i = 0; i < Matches.Count; i++)
+    {
+        Match match = Matches[i];
+        if (!match.isFinished)
+        {
+            indexer++;
+            activeMatches.Add(indexer.ToString(), match);
+            Console.WriteLine($"{indexer}) {match.FormatMatch()}");
+        }
+    }
+    string matchChoice = Prompt("Enter the number of the match you want to post the results for:");
+    if (activeMatches.ContainsKey(matchChoice))
+    {
+        Match selectedMatch = activeMatches[matchChoice];
+        int score1 = int.Parse(Prompt($"Enter the score for {selectedMatch.team1}:")); //TODO input validation
+        int score2 = int.Parse(Prompt($"Enter the score for {selectedMatch.team2}:"));
+
+        selectedMatch.score1 = score1;
+        selectedMatch.score2 = score2;
+        PayoutBetsOnMatch(selectedMatch);
+    }
+}
 //main
 CheckOrCreateFiles();
 Initialise();
 bool looping = true;
 while (looping)
 {
-    string choice = Prompt("WELCOME TO BET367\n=========\n1) Create Account\n2) Log In\n3) Make Bet\n4) View Your Bets\n5) View Matches\n6) Staff Menu\n7) Exit\nEnter Here:");
+    Console.WriteLine("WELCOME TO BET367\n=========");
+    if (isLoggedIn())
+    {
+        Console.WriteLine($"Logged in as: {LoggedInUser.username} | Balance: £{LoggedInUser.balance}");
+    }
+    string choice = Prompt("1) Create Account\n2) Log In\n3) Make Bet\n4) View Your Bets\n5) View Matches\n6) Staff Menu\n7) Exit\nEnter Here:");
+    
     switch(choice)
     {
         case "1":
@@ -291,7 +359,7 @@ while (looping)
                 if (activeMatches.ContainsKey(matchChoice))
                 {
                     Match selectedMatch = activeMatches[matchChoice];
-                    int predictedScore1 = int.Parse(Prompt($"Enter your predicted score for {selectedMatch.team1}:"));
+                    int predictedScore1 = int.Parse(Prompt($"Enter your predicted score for {selectedMatch.team1}:")); //TODO input validation
                     int predictedScore2 = int.Parse(Prompt($"Enter your predicted score for {selectedMatch.team2}:"));
                     float wagerAmount = float.Parse(Prompt($"Current Balance: £{LoggedInUser.balance}\nEnter the amount you want to wager:"));
                     if (wagerAmount > 0 && wagerAmount <= LoggedInUser.balance)
@@ -311,20 +379,49 @@ while (looping)
         case "4":
             if (isLoggedIn())
             {
+                List<Bet> activeBets = new List<Bet>();
+                List<Bet> finishedBets = new List<Bet>();
                 for (int i = 0; i < LoggedInUser.Bets.Count; i++)
                 {
                     Bet bet = LoggedInUser.Bets[i];
                     Match match = bet.GetMatch(Matches);
                     if (match != null)
                     {
-                        Console.WriteLine($"{match.FormatMatch()}");
+                        if (match.isFinished)
+                        {
+                            finishedBets.Add(bet);
+                        }
+                        else
+                        {
+                            activeBets.Add(bet);
+                        }
                     }
                 }
-
+                //YEAH
+                Console.WriteLine("ACTIVE BETS\n=======");
+                for (int i = 0; i < activeBets.Count; i++)
+                {
+                    Bet bet = activeBets[i];
+                    Match match = bet.GetMatch(Matches);
+                    if (match != null)
+                    {
+                        Console.WriteLine($"{i+1}) {match.FormatMatch()}: Predicted {bet.score1} - {bet.score2} on a £{bet.wageredAmount} bet.");
+                    }
+                }
+                Console.WriteLine("PREVIOUS BETS\n=======");
+                for (int i = finishedBets.Count-1; i >=0 ; i--)
+                {
+                    Bet bet = finishedBets[i];
+                    Match match = bet.GetMatch(Matches);
+                    if (match != null)
+                    {
+                        Console.WriteLine($"{finishedBets.Count-i}) {match.FormatMatch()} : Predicted {bet.score1} - {bet.score2} on a £{bet.wageredAmount} bet, got £{bet.BetResultCalculator(match)} back.");
+                    }
+                }
             }
             else
             {
-                Console.WriteLine("You must be logged in to make a bet.");
+                Console.WriteLine("You must be logged in to view your bets.");
             }
             break;
         case "5":
@@ -342,13 +439,14 @@ while (looping)
                 string password = Prompt("Enter the staff password:");
                 if (password == StaffMenuPassword)
                 {
-                    choice = Prompt("WELCOME TO BET367 ADMIN PANEL\n===========\n1) Add Match\n2) Placeholder\nEnter Here:");
+                    choice = Prompt("WELCOME TO BET367 ADMIN PANEL\n===========\n1) Add Match\n2) Post Results\nEnter Here:");
                     switch (choice)
                     {
                         case "1":
                             CreateMatch();
                             break;
                         case "2":
+                            PostResults();
                             break;
                         default:
                             Console.WriteLine("Invalid choice");
@@ -437,5 +535,21 @@ class Bet
             }
         }
         return null;
+    }
+    public float BetResultCalculator(Match match)
+    {
+        int accscore1 = match.score1;
+        int accscore2 = match.score2;
+        if (accscore1 == score1 && accscore2 == score2)
+        {
+            //exact
+            return wageredAmount * 3f;
+        }
+        else if ((accscore1 > accscore2 && score1 > score2) || (accscore1 < accscore2 && score1 < score2) || (accscore1 == accscore2 && score1 == score2))
+        {
+            //correct outcome
+            return wageredAmount * 1.5f;
+        }
+        return 0;
     }
 }
