@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System;
+﻿
 using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+
 //vital values
 string userdatafile = "userdata.json";
 string matchesfile = "matches.json";
@@ -16,7 +16,13 @@ int passwordMinDigits = 2;
 int usernameMaxLen = 10;
 int usernameMinLen = 4;
 
+string StaffMenuPassword = "passwordthosewhoknow";
+
+User LoggedInUser = null;
+
 List<User> Users = new List<User>();
+List<Match> Matches = new List<Match>();
+
 //functions
 void CheckFile(string file)
 {
@@ -145,7 +151,69 @@ string PasswordValidationCheck()
     }
     return password;
 }
+string Prompt(string txt)
+{
+    Console.WriteLine(txt);
+    return Console.ReadLine();
+}
+void SaveAllUsers()
+{
+    string data = "";
+    if (File.Exists(userdatafile))
+    {
+        foreach (User user in Users)
+        {
 
+            data += JsonSerializer.Serialize(user) + "\n";
+        }
+    }
+    File.WriteAllText(userdatafile, data);
+}
+void SaveAllMatches()
+{
+    string data = "";
+    if (File.Exists(matchesfile))
+    {
+        foreach (Match match in Matches)
+        {
+
+            data += JsonSerializer.Serialize(match) + "\n";
+        }
+    }
+    File.WriteAllText(matchesfile, data);
+}
+void Initialise()
+{
+    //user
+    if (File.Exists(userdatafile))
+    {
+        List<string> data = File.ReadAllLines(userdatafile).ToList();
+        foreach (string potentialuser in data)
+        {
+            if (potentialuser.Length > 0)
+            {
+                Users.Add(JsonSerializer.Deserialize<User>(potentialuser));
+            }
+        }
+    }
+    //matches
+    if (File.Exists(matchesfile))
+    {
+        List<string> data = File.ReadAllLines(matchesfile).ToList();
+        foreach (string potentialmatch in data)
+        {
+            if (potentialmatch.Length > 0)
+            {
+                Matches.Add(JsonSerializer.Deserialize<Match>(potentialmatch));
+            }
+        }
+    }
+}
+bool isLoggedIn()
+{
+    return LoggedInUser != null;
+}
+//MENU FUNCTIONS
 void CreateAccount()
 {
     string username = UsernameValidationCheck();
@@ -155,31 +223,120 @@ void CreateAccount()
     string password = PasswordValidationCheck();
     User user = new User(username, fname, lname, password);
     Users.Add(user);
-    if (File.Exists(userdatafile))
+    SaveAllUsers();
+}
+void LogIn()
+{
+    string username = Prompt("Enter your username: ");
+    if (UsernameInUse(username))
     {
-        string jsonString = JsonSerializer.Serialize(user);
-        Console.WriteLine(jsonString);
-        File.WriteAllText(userdatafile, jsonString);
+        User user = GetUserFromUsername(username);
+        string password = Prompt("Enter your password: ");
+        if (user.password == password)
+        {
+            LoggedInUser = user;
+            Console.WriteLine($"Welcome back {user.fname} {user.lname}!");
+        }
+        else
+        {
+            Console.WriteLine("Incorrect Password.");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Account Not Found.");
     }
 }
-
-string Prompt(string txt)
+void CreateMatch()
 {
-    Console.WriteLine(txt);
-    return Console.ReadLine();
+    string team1 = Prompt("Enter the name of Team 1:");
+    string team2 = Prompt("Enter the name of Team 2:");
+    Match match = new Match($"MATCH_{Matches.Count}",team1,team2);
+    Matches.Add(match);
+    SaveAllMatches();
 }
 //main
 CheckOrCreateFiles();
-CreateAccount();
+Initialise();
+bool looping = true;
+while (looping)
+{
+    string choice = Prompt("WELCOME TO BET367\n=========\n1) Create Account\n2) Log In\n3) Make Bet\n4) View Matches\n5) Staff Menu\n6) Exit\nEnter Here:");
+    switch(choice)
+    {
+        case "1":
+            CreateAccount();
+            break;
+        case "2":
+            LogIn();
+            break;
+        case "3":
+            if (isLoggedIn())
+            {
+                
+            }
+            else
+            {
+                Console.WriteLine("You must be logged in to make a bet.");
+            }
+            break;
+        case "4":
+            Console.WriteLine("MATCHES\n==========");
+            for(int i = 0; i < Matches.Count; i++)
+            {
+                Match match = Matches[i];
+                Console.WriteLine($"{i+1}) {match.FormatMatch()}");
+            }
+            Console.WriteLine("==========");
+            break;
+        case "5":
+            if (isLoggedIn())
+            {
+                string password = Prompt("Enter the staff password:");
+                if (password == StaffMenuPassword)
+                {
+                    choice = Prompt("WELCOME TO BET367 ADMIN PANEL\n===========\n1) Add Match\n2) Placeholder\nEnter Here:");
+                    switch (choice)
+                    {
+                        case "1":
+                            CreateMatch();
+                            break;
+                        case "2":
+                            break;
+                        default:
+                            Console.WriteLine("Invalid choice");
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Incorrect Password.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("You must be logged in to view staff menu");
+            }
+            break;
+        case "6":
+            looping = false;
+            break;
+        default:
+            Console.WriteLine("Invalid choice, try again.");
+            break;
+    }
+    Prompt(looping?"Press enter to continue...":"Goodbye!");
+    Console.Clear();
+}
 //classes
 class User
 {
-    public string username;
-    public string fname;
-    public string lname;
-    public string password;
-    public float balance;
-    public List<Bet> Bets = new List<Bet>();
+    [JsonInclude] public string username;
+    [JsonInclude] public string fname;
+    [JsonInclude] public string lname;
+    [JsonInclude] public string password;
+    [JsonInclude] public float balance;
+    [JsonInclude] public List<Bet> Bets = new List<Bet>();
     public User(string username, string fname, string lname, string password)
     {
         this.username = username;
@@ -191,31 +348,31 @@ class User
 }
 class Match
 {
-    public string matchID;
-    public string team1;
-    public string team2;
-    public int score1;
-    public int score2;
-    public bool isFinished = false;
-    public Match(string matchID, string team1, string team2, int score1, int score2)
+    [JsonInclude] public string matchID;
+    [JsonInclude] public string team1;
+    [JsonInclude] public string team2;
+    [JsonInclude] public int score1;
+    [JsonInclude] public int score2;
+    [JsonInclude] public bool isFinished = false;
+    public Match(string matchID, string team1, string team2)
     {
         this.matchID = matchID;
         this.team1 = team1;
         this.team2 = team2;
-        this.score1 = score1;
-        this.score2 = score2;
+        this.score1 = 0;
+        this.score2 = 0;
     }
     public string FormatMatch()
     {
-        return ($"{team1} VS {team2}\n {(isFinished ? $"{score1} - {score2}" : "Awaiting Kickoff")}");
+        return ($"{team1} VS {team2} = {(isFinished ? $"{score1} - {score2}" : "Awaiting Kickoff")}");
     }
 }
 class Bet
 {
-    public string matchID;
-    public int score1;
-    public int score2;
-    public float wageredAmount;
+    [JsonInclude] public string matchID;
+    [JsonInclude] public int score1;
+    [JsonInclude]public int score2;
+    [JsonInclude] public float wageredAmount;
     public Bet(string matchID, int score1, int score2, float wageredAmount)
     {
         this.matchID = matchID;
