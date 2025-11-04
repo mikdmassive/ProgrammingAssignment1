@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -261,7 +262,7 @@ Initialise();
 bool looping = true;
 while (looping)
 {
-    string choice = Prompt("WELCOME TO BET367\n=========\n1) Create Account\n2) Log In\n3) Make Bet\n4) View Matches\n5) Staff Menu\n6) Exit\nEnter Here:");
+    string choice = Prompt("WELCOME TO BET367\n=========\n1) Create Account\n2) Log In\n3) Make Bet\n4) View Your Bets\n5) View Matches\n6) Staff Menu\n7) Exit\nEnter Here:");
     switch(choice)
     {
         case "1":
@@ -273,7 +274,34 @@ while (looping)
         case "3":
             if (isLoggedIn())
             {
-                
+                Console.WriteLine("AVALIABLE MATCHES\n==========");
+                Dictionary<string, Match> activeMatches = new Dictionary<string, Match>();
+                int indexer = 0;
+                for (int i = 0; i < Matches.Count; i++)
+                {
+                    Match match = Matches[i];
+                    if (!match.isFinished)
+                    {
+                        indexer++;
+                        activeMatches.Add(indexer.ToString(), match);
+                        Console.WriteLine($"{indexer}) {match.FormatMatch()}");
+                    }
+                }
+                string matchChoice = Prompt("Enter the number of the match you want to bet on:");
+                if (activeMatches.ContainsKey(matchChoice))
+                {
+                    Match selectedMatch = activeMatches[matchChoice];
+                    int predictedScore1 = int.Parse(Prompt($"Enter your predicted score for {selectedMatch.team1}:"));
+                    int predictedScore2 = int.Parse(Prompt($"Enter your predicted score for {selectedMatch.team2}:"));
+                    float wagerAmount = float.Parse(Prompt($"Current Balance: £{LoggedInUser.balance}\nEnter the amount you want to wager:"));
+                    if (wagerAmount > 0 && wagerAmount <= LoggedInUser.balance)
+                    {
+                        LoggedInUser.balance -= wagerAmount;
+                        Bet bet = new Bet(selectedMatch.matchID, predictedScore1, predictedScore2, wagerAmount);
+                        LoggedInUser.Bets.Add(bet);
+                        SaveAllUsers();
+                    }
+                }
             }
             else
             {
@@ -281,6 +309,25 @@ while (looping)
             }
             break;
         case "4":
+            if (isLoggedIn())
+            {
+                for (int i = 0; i < LoggedInUser.Bets.Count; i++)
+                {
+                    Bet bet = LoggedInUser.Bets[i];
+                    Match match = bet.GetMatch(Matches);
+                    if (match != null)
+                    {
+                        Console.WriteLine($"{match.FormatMatch()}");
+                    }
+                }
+
+            }
+            else
+            {
+                Console.WriteLine("You must be logged in to make a bet.");
+            }
+            break;
+        case "5":
             Console.WriteLine("MATCHES\n==========");
             for(int i = 0; i < Matches.Count; i++)
             {
@@ -289,7 +336,7 @@ while (looping)
             }
             Console.WriteLine("==========");
             break;
-        case "5":
+        case "6":
             if (isLoggedIn())
             {
                 string password = Prompt("Enter the staff password:");
@@ -318,7 +365,7 @@ while (looping)
                 Console.WriteLine("You must be logged in to view staff menu");
             }
             break;
-        case "6":
+        case "7":
             looping = false;
             break;
         default:
@@ -379,5 +426,16 @@ class Bet
         this.score1 = score1;
         this.score2 = score2;
         this.wageredAmount = wageredAmount;
+    }
+    public Match GetMatch(List<Match> matches)
+    {
+        foreach (Match match in matches)
+        {
+            if (match.matchID == matchID)
+            {
+                return match;
+            }
+        }
+        return null;
     }
 }
