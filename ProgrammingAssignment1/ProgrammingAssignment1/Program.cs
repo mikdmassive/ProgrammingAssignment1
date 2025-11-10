@@ -439,18 +439,33 @@ while (looping)
                 string password = Prompt("Enter the staff password:");
                 if (password == StaffMenuPassword)
                 {
-                    choice = Prompt("WELCOME TO BET367 ADMIN PANEL\n===========\n1) Add Match\n2) Post Results\nEnter Here:");
-                    switch (choice)
+                    bool stafflooping = true;   
+                    Console.Clear();
+                    while (stafflooping)
                     {
-                        case "1":
-                            CreateMatch();
-                            break;
-                        case "2":
-                            PostResults();
-                            break;
-                        default:
-                            Console.WriteLine("Invalid choice");
-                            break;
+
+                        choice = Prompt("WELCOME TO BET367 ADMIN PANEL\n===========\n1) Add Match\n2) Post Results\n3) Return To Main Menu\nEnter Here:");
+                        switch (choice)
+                        {
+                            case "1":
+                                CreateMatch();
+                                break;
+                            case "2":
+                                PostResults();
+                                break;
+                            case "3":
+                                stafflooping = false;
+                                Console.WriteLine("Goodbye!");
+                                break;
+                            default:
+                                Console.WriteLine("Invalid choice");
+                                break;
+                        }
+                        if (stafflooping)
+                        {
+                            Prompt("Press enter to continue...");
+                            Console.Clear();
+                        }
                     }
                 }
                 else
