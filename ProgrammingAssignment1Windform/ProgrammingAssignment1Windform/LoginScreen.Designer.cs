@@ -29,16 +29,22 @@
         private void InitializeComponent()
         {
             gbLogin = new GroupBox();
+            UsernameMessageLabel = new Label();
+            PasswordLabel = new Label();
+            UsernameLabel = new Label();
+            passwordTextBox = new TextBox();
+            usernameTextBox = new TextBox();
             LoginButton = new Button();
-            textBox1 = new TextBox();
-            textBox2 = new TextBox();
             gbLogin.SuspendLayout();
             SuspendLayout();
             // 
             // gbLogin
             // 
-            gbLogin.Controls.Add(textBox2);
-            gbLogin.Controls.Add(textBox1);
+            gbLogin.Controls.Add(UsernameMessageLabel);
+            gbLogin.Controls.Add(PasswordLabel);
+            gbLogin.Controls.Add(UsernameLabel);
+            gbLogin.Controls.Add(passwordTextBox);
+            gbLogin.Controls.Add(usernameTextBox);
             gbLogin.Controls.Add(LoginButton);
             gbLogin.Location = new Point(30, 37);
             gbLogin.Name = "gbLogin";
@@ -46,6 +52,51 @@
             gbLogin.TabIndex = 0;
             gbLogin.TabStop = false;
             gbLogin.Text = "Login";
+            // 
+            // UsernameMessageLabel
+            // 
+            UsernameMessageLabel.Anchor = AnchorStyles.Top;
+            UsernameMessageLabel.AutoSize = true;
+            UsernameMessageLabel.Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            UsernameMessageLabel.Location = new Point(0, 89);
+            UsernameMessageLabel.Name = "UsernameMessageLabel";
+            UsernameMessageLabel.Size = new Size(79, 21);
+            UsernameMessageLabel.TabIndex = 5;
+            UsernameMessageLabel.Text = "MESSAGE";
+            // 
+            // PasswordLabel
+            // 
+            PasswordLabel.AutoSize = true;
+            PasswordLabel.Location = new Point(45, 151);
+            PasswordLabel.Name = "PasswordLabel";
+            PasswordLabel.Size = new Size(87, 25);
+            PasswordLabel.TabIndex = 4;
+            PasswordLabel.Text = "Password";
+            // 
+            // UsernameLabel
+            // 
+            UsernameLabel.AutoSize = true;
+            UsernameLabel.Location = new Point(45, 27);
+            UsernameLabel.Name = "UsernameLabel";
+            UsernameLabel.Size = new Size(91, 25);
+            UsernameLabel.TabIndex = 3;
+            UsernameLabel.Text = "Username";
+            // 
+            // passwordTextBox
+            // 
+            passwordTextBox.Location = new Point(45, 179);
+            passwordTextBox.Name = "passwordTextBox";
+            passwordTextBox.Size = new Size(205, 31);
+            passwordTextBox.TabIndex = 2;
+            passwordTextBox.TextChanged += PasswordTextChanged;
+            // 
+            // usernameTextBox
+            // 
+            usernameTextBox.Location = new Point(45, 55);
+            usernameTextBox.Name = "usernameTextBox";
+            usernameTextBox.Size = new Size(208, 31);
+            usernameTextBox.TabIndex = 1;
+            usernameTextBox.TextChanged += UsernameTextChange;
             // 
             // LoginButton
             // 
@@ -56,21 +107,6 @@
             LoginButton.Text = "Submit";
             LoginButton.UseVisualStyleBackColor = true;
             // 
-            // textBox1
-            // 
-            textBox1.Location = new Point(45, 55);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(208, 31);
-            textBox1.TabIndex = 1;
-            //textBox1.TextChanged += this.textBox1_TextChanged;
-            // 
-            // textBox2
-            // 
-            textBox2.Location = new Point(45, 158);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(205, 31);
-            textBox2.TabIndex = 2;
-            // 
             // LoginScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -79,6 +115,7 @@
             Controls.Add(gbLogin);
             Name = "LoginScreen";
             Text = "Login";
+            Load += LoginScreen_Load;
             gbLogin.ResumeLayout(false);
             gbLogin.PerformLayout();
             ResumeLayout(false);
@@ -87,8 +124,11 @@
         #endregion
 
         private GroupBox gbLogin;
-        private TextBox textBox2;
-        private TextBox textBox1;
+        private TextBox passwordTextBox;
+        private TextBox usernameTextBox;
         private Button LoginButton;
+        private Label UsernameLabel;
+        private Label PasswordLabel;
+        private Label UsernameMessageLabel;
     }
 }

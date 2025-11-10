@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
-class Bet
+public class Bet
 {
     [JsonInclude] public string matchID;
     [JsonInclude] public int score1;

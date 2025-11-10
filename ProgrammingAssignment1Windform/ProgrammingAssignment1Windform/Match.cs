@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-class Match
+public class Match
 {
     [JsonInclude] public string matchID;
     [JsonInclude] public string team1;

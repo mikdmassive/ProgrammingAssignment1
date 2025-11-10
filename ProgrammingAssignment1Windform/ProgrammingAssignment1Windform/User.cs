@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-class User
+public class User
 {
     [JsonInclude] public string username;
     [JsonInclude] public string fname;
