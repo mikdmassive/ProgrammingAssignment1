@@ -128,9 +128,47 @@ namespace ProgrammingAssignment1Windform
             }
         }
 
-        private void LoginScreen_Load(object sender, EventArgs e)
+        private void LoginUsernameTextBox_TextChanged(object sender, EventArgs e)
         {
+            string text = LoginUsernameTextBox.Text;
+            if (UsernameInUse(text))
+            {
+                LoginUsernameTextBox.BackColor = Color.LightGreen;
+            }
+            else
+            {
+                LoginUsernameTextBox.BackColor = Color.White;
+            }
+        }
 
+        private void LoginButton_Click(object sender, EventArgs e)
+        {
+            string username = LoginUsernameTextBox.Text;
+            if (UsernameInUse(username))
+            {
+                User theuser = null;
+                foreach (User user in Users)
+                {
+                    if (user.username == username)
+                    {
+                        theuser = user;
+                    }
+                }
+                if (theuser != null)//check password
+                {
+                    if(theuser.password == LoginPasswordTextBox.Text)//success
+                    {
+                        //todo : login
+                        this.Hide();
+                        Program.Login(theuser);
+                    }
+                    else
+                    {
+                        LoginPasswordTextBox.Text = "";
+                    }
+                
+                }
+            }
         }
     }
 }

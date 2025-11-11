@@ -67,5 +67,11 @@ namespace ProgrammingAssignment1Windform
             ApplicationConfiguration.Initialize();
             Application.Run(new LoginScreen(Users));
         }
+        public static void Login(User user)
+        {
+            Form mainMenu = new MainMenu(user,Matches);//(user, Users, Matches));
+            mainMenu.Show();
+            
+        }
     }
 }
