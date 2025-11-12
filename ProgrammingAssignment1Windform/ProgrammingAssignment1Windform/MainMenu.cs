@@ -46,7 +46,7 @@ namespace ProgrammingAssignment1Windform
             }
 
         }
-        void CreateMessageLabel(string name, string txt, bool border)
+        Label CreateMessageLabel(string name, string txt, bool border)
         {
 
             Label label = new Label();
@@ -64,6 +64,7 @@ namespace ProgrammingAssignment1Windform
             label.TextAlign = ContentAlignment.MiddleCenter;
 
             UsedGroupBox.Controls.Add(label);
+            return label;
         }
         Button CreateButton(string name, string txt)
         {
@@ -106,10 +107,42 @@ namespace ProgrammingAssignment1Windform
             CreateMessageLabel("WelcomeMessage", "Welcome To The Staff Menu", false);
             Button CreateMatchButton = CreateButton("CreateMatchButton", "Create Match");
             Button PostResultsButton = CreateButton("PostResultsButton", "Post Match Results");
-            CreateMatchButton.Click += (sender, e) => { MatchCreation(); } ;
+            CreateMatchButton.Click += (sender, e) => { MatchCreation(); };
             PostResultsButton.Click += (sender, e) => { PostResultsSelection(); };
         }
+        private bool verifyMatchName(TextBox tb)
+        {
+            string text = tb.Text;
+            return !string.IsNullOrWhiteSpace(text) && text.Length <= 20 && text.Length > 2;
+        }
+        private void ColourTeamTextBox(TextBox tb)
+        {
+            string text = tb.Text;
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                tb.BackColor = Color.White;
+            }
+            else
+            {
+                if (verifyMatchName(tb))
+                {
+                    tb.BackColor = Color.LightGreen;
+                }
+                else
+                {
+                    tb.BackColor = Color.LightCoral;
+                }
+            }
 
+        }
+        private void MatchNameVerifyMessage(TextBox tb1, TextBox tb2, Label msg)
+        {
+
+            ColourTeamTextBox(tb1);
+            ColourTeamTextBox(tb2);
+            msg.Text = verifyMatchName(tb1) && verifyMatchName(tb2) ? "" : "Both team names must be between 1-20 characters and cannot be blank";
+
+        }
         private void MatchCreation()
         {
             PrepareGB("Match Creation");
@@ -117,12 +150,23 @@ namespace ProgrammingAssignment1Windform
             TextBox t1tb = CreateTextbox("Team1TextBox");
             CreateMessageLabel("T1Label", "Enter Team 2 Name", false);
             TextBox t2tb = CreateTextbox("Team2TextBox");
+            Label msgLabel = CreateMessageLabel("ErrorMessageLabel", "", false);
             Button CreateMatchButton = CreateButton("CreateMatchButton", "Create Match");
-            bool verify(TextBox tb)
+
+            t1tb.TextChanged += (sender, e) => { MatchNameVerifyMessage(t1tb, t2tb, msgLabel); };
+            t2tb.TextChanged += (sender, e) => { MatchNameVerifyMessage(t1tb, t2tb, msgLabel); };
+
+            CreateMatchButton.Click += (sender, e) =>
             {
-                string text = tb.Text;
-                return string.IsNullOrWhiteSpace(text) && text.Length <= 10;
-            }
+                if (verifyMatchName(t1tb) && verifyMatchName(t2tb))
+                {
+                    Program.CreateMatch(t1tb.Text, t2tb.Text);
+                    t1tb.Text = "";
+                    t2tb.Text = "";
+                    msgLabel.Text = "Match Created!";
+                }
+            };
+
             Button BackButton = CreateButton("BackButton", "Return To Staff Menu");
             BackButton.Click += (sender, e) => { StaffMenuLogin(); };
         }
@@ -146,33 +190,45 @@ namespace ProgrammingAssignment1Windform
                 CreateMessageLabel("NoMatchesToBetOn", "There are currently no matches to post the results for.", false);
             }
             Button BackButton = CreateButton("BackButton", "Return To Staff Menu");
-            
+            BackButton.Click += (sender, e) => { StaffMenuLogin(); };
+
+        }
+        private bool verifyScore(TextBox tb)
+        {
+            string text = tb.Text;
+            bool valid = false;
+            if (int.TryParse(text, out int number))
+            {
+                if (number >= 0)
+                {
+                    valid = true;
+                }
+            }
+            return valid;
         }
         private void PostResultsMenu(Match match)
         {
-            if (match == null)
+            if (match != null)
             {
                 PrepareGB($"Post Results for {match.FormatMatchNoScore()}");
-                CreateMessageLabel("T1Label",$"Enter {match.team1} Score", false);
+                CreateMessageLabel("T1Label", $"Enter {match.team1} Score", false);
                 TextBox t1tb = CreateTextbox("Team1TextBox");
                 CreateMessageLabel("T1Label", $"Enter {match.team2} Score", false);
                 TextBox t2tb = CreateTextbox("Team2TextBox");
-                bool verify(TextBox tb)
-                {
-                    string text = tb.Text;
-                    return int.TryParse(text, out int number);
-                }
+
                 Button PublishMatchButton = CreateButton("PublishMatchButton", "Post");
                 PublishMatchButton.Click += (sender, e) =>
                 {
-                    if (verify(t1tb) && verify(t2tb))
+                    if (verifyScore(t1tb) && verifyScore(t2tb))
                     {
                         //todo post match
 
                         Program.PayoutBetsOnMatch(Convert.ToInt32(t1tb.Text), Convert.ToInt32(t2tb.Text), match.matchID);
+                        PostResultsSelection();
+
                     }
                 };
-                       
+
             }
         }
         private void vScrollBar1_Scroll(object sender, ScrollEventArgs e)
@@ -216,6 +272,38 @@ namespace ProgrammingAssignment1Windform
             }
         }
 
+        private void BetScreen(Match match)
+        {
+            PrepareGB($"Betting on {match.FormatMatchNoScore()}");
+            CreateMessageLabel("PredictionMsg", $"Enter your predictions", false);
+            CreateMessageLabel("T1Label", $"Enter {match.team1} Score", false);
+            TextBox t1tb = CreateTextbox("Team1TextBox");
+            CreateMessageLabel("T1Label", $"Enter {match.team2} Score", false);
+            TextBox t2tb = CreateTextbox("Team2TextBox");
+            CreateMessageLabel("T1Label", "Enter Your Wager", false);
+
+            TextBox wagertb = CreateTextbox("Team2TextBox");
+
+            Button PlaceBetButton = CreateButton("ConfirmPredictions", "Place Bet");
+            PlaceBetButton.Click += (sender, e) =>
+            {
+                if (verifyScore(t1tb) && verifyScore(t2tb))
+                {
+                    //todo verify deposit
+                    string wager = wagertb.Text;
+                    if (float.TryParse(wager, out float number))
+                    {
+                        if (user.balance - number >= 0 && number > 0)
+                        {
+                            Program.PlaceBet(match, Convert.ToInt32(t1tb.Text), Convert.ToInt32(t2tb.Text), number);
+                            PrepareGB("");
+                        }
+                    }
+
+                }
+            };
+        }
+
         private void PlaceBets_Click(object sender, EventArgs e)
         {
             PrepareGB("Place Bets");
@@ -226,9 +314,10 @@ namespace ProgrammingAssignment1Windform
                 Debug.WriteLine(match.matchID);
                 if (!match.isFinished)
                 {
-                    CreateButton(match.matchID, match.FormatMatchNoScore());
+                    Button betbutton = CreateButton(match.matchID, match.FormatMatchNoScore());
+                    betbutton.Click += (sender, e) => { BetScreen(match); };
                 }
-              
+
             }
             if (UsedGroupBox.Controls.Count == 0)
             {
@@ -260,10 +349,10 @@ namespace ProgrammingAssignment1Windform
             PrepareGB("Staff Menu Log In");
             CreateMessageLabel("StaffPasswordLabel", "Enter Staff Password", false);
             TextBox textbox = CreateTextbox("StaffPasswordTextBox");
-            Button StaffPasswordButton =  CreateButton("StaffPasswordButton","Submit");
+            Button StaffPasswordButton = CreateButton("StaffPasswordButton", "Submit");
             StaffPasswordButton.Click += (sender, e) =>
             {
-                if(textbox.Text == staffpassword)
+                if (textbox.Text == staffpassword)
                 {
                     // todo staff login
                     StaffMenuLogin();
@@ -272,12 +361,13 @@ namespace ProgrammingAssignment1Windform
                 {
                     textbox.Text = "";
                 }
-            }; 
-           
-        }
-        private void SelectBet(Button sender, EventArgs e)
-        {
+            };
 
+        }
+
+        private void LogoutButton_Click(object sender, EventArgs e)
+        {
+            Program.LogOut();
         }
     }
 }

@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using System.Xml.Linq;
 
 namespace ProgrammingAssignment1Windform
 {
@@ -29,6 +31,8 @@ namespace ProgrammingAssignment1Windform
         static List<Match> Matches = new List<Match>();
 
         static User user = null;
+
+        static LoginScreen loginScreen = null;
 
         static MainMenu mainMenu = null;
         static void Initialise()
@@ -86,6 +90,29 @@ namespace ProgrammingAssignment1Windform
                 }
             }
             return matchPointer;
+        }
+        public static void CreateAccount(string username, string fname, string lname, string password)
+        {
+            User newuser = new User(username, fname, lname, password);
+            Users.Add(newuser);
+            SaveAllUsers();
+            Login(newuser);
+        }
+        public static void CreateMatch(string team1, string team2)
+        {
+            Match match = new Match($"MATCH_{Matches.Count}", team1, team2);
+            Matches.Add(match);
+            SaveAllMatches();
+            mainMenu.UpdateStats(user,Matches);
+        }
+       
+        public static void PlaceBet(Match selectedMatch, int predictedScore1, int predictedScore2, float wagerAmount)
+        {
+            user.balance -= wagerAmount;
+            Bet bet = new Bet(selectedMatch.matchID, predictedScore1, predictedScore2, wagerAmount);
+            user.Bets.Add(bet);
+            SaveAllUsers();
+            mainMenu.UpdateStats(user, Matches);
         }
         public static void PayoutBetsOnMatch(int score1,int score2,string matchid)
         {
@@ -155,7 +182,8 @@ namespace ProgrammingAssignment1Windform
             CheckOrCreateFiles();
             Initialise();
             ApplicationConfiguration.Initialize();
-            Application.Run(new LoginScreen(Users));
+            loginScreen = new LoginScreen(Users);
+            Application.Run(loginScreen);
         }
         public static void Login(User userr)
         {
@@ -164,6 +192,13 @@ namespace ProgrammingAssignment1Windform
             mainMenu = new MainMenu(user,Matches);//(user, Users, Matches));
             mainMenu.Show();
             
+        }
+        public static void LogOut()
+        {
+            user = null;
+            mainMenu.Hide();
+            loginScreen = new LoginScreen(Users);
+            loginScreen.Show();
         }
     }
 }
