@@ -28,6 +28,9 @@ namespace ProgrammingAssignment1Windform
         static List<User> Users = new List<User>();
         static List<Match> Matches = new List<Match>();
 
+        static User user = null;
+
+        static MainMenu mainMenu = null;
         static void Initialise()
         {
             Users.Clear();
@@ -58,6 +61,91 @@ namespace ProgrammingAssignment1Windform
                 }
             }
         }
+        static void SaveAllUsers()
+        {
+            string data = "";
+            if (File.Exists(userdatafile))
+            {
+                foreach (User user in Users)
+                {
+
+                    data += JsonSerializer.Serialize(user) + "\n";
+                }
+            }
+            File.WriteAllText(userdatafile, data);
+        }
+
+        static Match GetMatchFromID(string id)
+        {
+            Match matchPointer = null;
+            foreach (Match match in Matches)
+            {
+                if (match.matchID == id)
+                {
+                    matchPointer = match;
+                }
+            }
+            return matchPointer;
+        }
+        public static void PayoutBetsOnMatch(int score1,int score2,string matchid)
+        {
+            if (File.Exists(matchesfile) && File.Exists(userdatafile))
+            {
+                Match match = GetMatchFromID(matchid);
+                if (match!=null)
+                {
+                    if (!match.isFinished)
+                    {
+                        match.score1 = score1;
+                        match.score2 = score2;
+                        match.isFinished = true;
+                        foreach (User user in Users)
+                        {
+                            foreach (Bet bet in user.Bets)
+                            {
+                                Match betmatch = bet.GetMatch(Matches);
+                                if (betmatch == match)
+                                {
+                                    //Correct match
+                                    float payout = bet.BetResultCalculator(match);
+
+                                    user.balance += payout;
+                                }
+                            }
+                        }
+
+                        SaveAllMatches();
+                        SaveAllUsers();
+                        if (mainMenu != null)
+                        {
+                            mainMenu.UpdateStats(user, Matches);
+                        }
+
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("File error, fixing...");
+                CheckOrCreateFiles();
+                Console.WriteLine("Fixed!");
+            }
+
+        }
+        static void SaveAllMatches()
+        {
+            string data = "";
+            if (File.Exists(matchesfile))
+            {
+                foreach (Match match in Matches)
+                {
+
+                    data += JsonSerializer.Serialize(match) + "\n";
+                }
+            }
+            File.WriteAllText(matchesfile, data);
+        }
+        
         [STAThread]
         static void Main()
         {
@@ -69,10 +157,11 @@ namespace ProgrammingAssignment1Windform
             ApplicationConfiguration.Initialize();
             Application.Run(new LoginScreen(Users));
         }
-        public static void Login(User user)
+        public static void Login(User userr)
         {
             Debug.WriteLine(Matches.Count);
-            Form mainMenu = new MainMenu(user,Matches);//(user, Users, Matches));
+            user = userr;
+            mainMenu = new MainMenu(user,Matches);//(user, Users, Matches));
             mainMenu.Show();
             
         }

@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProgrammingAssignment1Windform
 {
@@ -26,13 +27,22 @@ namespace ProgrammingAssignment1Windform
             InitializeComponent();
 
         }
-
+        public void UpdateStats(User userr, List<Match> matches)
+        {
+            user = userr;
+            Matches = matches;
+            updateWelcome();
+        }
+        private void updateWelcome()
+        {
+            MainMenuGroupBox.Text = $"Welcome, {user.fname} {user.lname}!";
+            Balance.Text = "Balance: £" + user.balance.ToString("0.00");
+        }
         private void MainMenu_Load(object sender, EventArgs e)
         {
             if (user != null)
             {
-                MainMenuGroupBox.Text = $"Welcome, {user.fname} {user.lname}!";
-                Balance.Text = "Balance: £" + user.balance.ToString("0.00");
+                updateWelcome();
             }
 
         }
@@ -108,6 +118,11 @@ namespace ProgrammingAssignment1Windform
             CreateMessageLabel("T1Label", "Enter Team 2 Name", false);
             TextBox t2tb = CreateTextbox("Team2TextBox");
             Button CreateMatchButton = CreateButton("CreateMatchButton", "Create Match");
+            bool verify(TextBox tb)
+            {
+                string text = tb.Text;
+                return string.IsNullOrWhiteSpace(text) && text.Length <= 10;
+            }
             Button BackButton = CreateButton("BackButton", "Return To Staff Menu");
             BackButton.Click += (sender, e) => { StaffMenuLogin(); };
         }
@@ -138,6 +153,26 @@ namespace ProgrammingAssignment1Windform
             if (match == null)
             {
                 PrepareGB($"Post Results for {match.FormatMatchNoScore()}");
+                CreateMessageLabel("T1Label",$"Enter {match.team1} Score", false);
+                TextBox t1tb = CreateTextbox("Team1TextBox");
+                CreateMessageLabel("T1Label", $"Enter {match.team2} Score", false);
+                TextBox t2tb = CreateTextbox("Team2TextBox");
+                bool verify(TextBox tb)
+                {
+                    string text = tb.Text;
+                    return int.TryParse(text, out int number);
+                }
+                Button PublishMatchButton = CreateButton("PublishMatchButton", "Post");
+                PublishMatchButton.Click += (sender, e) =>
+                {
+                    if (verify(t1tb) && verify(t2tb))
+                    {
+                        //todo post match
+
+                        Program.PayoutBetsOnMatch(Convert.ToInt32(t1tb.Text), Convert.ToInt32(t2tb.Text), match.matchID);
+                    }
+                };
+                       
             }
         }
         private void vScrollBar1_Scroll(object sender, ScrollEventArgs e)
