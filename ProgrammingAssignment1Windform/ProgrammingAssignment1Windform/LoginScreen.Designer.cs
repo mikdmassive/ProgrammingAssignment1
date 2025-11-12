@@ -152,6 +152,7 @@
             LoginPasswordTextBox.Name = "LoginPasswordTextBox";
             LoginPasswordTextBox.Size = new Size(205, 31);
             LoginPasswordTextBox.TabIndex = 2;
+            LoginPasswordTextBox.TextChanged += LoginPasswordTextBox_TextChanged;
             // 
             // LoginUsernameTextBox
             // 

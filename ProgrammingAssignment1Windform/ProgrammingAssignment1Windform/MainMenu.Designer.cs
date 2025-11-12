@@ -29,16 +29,20 @@
         private void InitializeComponent()
         {
             MainMenuGroupBox = new GroupBox();
+            BetHistoryButton = new Button();
+            Balance = new Label();
             UsedGroupBox = new GroupBox();
             PlaceBets = new Button();
             ViewMatchesButton = new Button();
             ViewBetsButton = new Button();
-            Balance = new Label();
+            StaffMenuButton = new Button();
             MainMenuGroupBox.SuspendLayout();
             SuspendLayout();
             // 
             // MainMenuGroupBox
             // 
+            MainMenuGroupBox.Controls.Add(StaffMenuButton);
+            MainMenuGroupBox.Controls.Add(BetHistoryButton);
             MainMenuGroupBox.Controls.Add(Balance);
             MainMenuGroupBox.Controls.Add(UsedGroupBox);
             MainMenuGroupBox.Controls.Add(PlaceBets);
@@ -46,16 +50,36 @@
             MainMenuGroupBox.Controls.Add(ViewBetsButton);
             MainMenuGroupBox.Location = new Point(39, 26);
             MainMenuGroupBox.Name = "MainMenuGroupBox";
-            MainMenuGroupBox.Size = new Size(749, 432);
+            MainMenuGroupBox.Size = new Size(1010, 501);
             MainMenuGroupBox.TabIndex = 0;
             MainMenuGroupBox.TabStop = false;
             MainMenuGroupBox.Text = "groupBox1";
             // 
+            // BetHistoryButton
+            // 
+            BetHistoryButton.Location = new Point(27, 248);
+            BetHistoryButton.Name = "BetHistoryButton";
+            BetHistoryButton.Size = new Size(136, 59);
+            BetHistoryButton.TabIndex = 7;
+            BetHistoryButton.Text = "View Bet History";
+            BetHistoryButton.UseVisualStyleBackColor = true;
+            BetHistoryButton.Click += BetHistoryButton_Click;
+            // 
+            // Balance
+            // 
+            Balance.AutoSize = true;
+            Balance.BorderStyle = BorderStyle.FixedSingle;
+            Balance.Location = new Point(27, 45);
+            Balance.Name = "Balance";
+            Balance.Size = new Size(61, 27);
+            Balance.TabIndex = 6;
+            Balance.Text = "label1";
+            // 
             // UsedGroupBox
             // 
-            UsedGroupBox.Location = new Point(443, 18);
+            UsedGroupBox.Location = new Point(256, 18);
             UsedGroupBox.Name = "UsedGroupBox";
-            UsedGroupBox.Size = new Size(300, 414);
+            UsedGroupBox.Size = new Size(742, 477);
             UsedGroupBox.TabIndex = 5;
             UsedGroupBox.TabStop = false;
             UsedGroupBox.Enter += groupBox1_Enter;
@@ -90,21 +114,21 @@
             ViewBetsButton.UseVisualStyleBackColor = true;
             ViewBetsButton.Click += ViewBetsButton_Click;
             // 
-            // Balance
+            // StaffMenuButton
             // 
-            Balance.AutoSize = true;
-            Balance.BorderStyle = BorderStyle.FixedSingle;
-            Balance.Location = new Point(27, 45);
-            Balance.Name = "Balance";
-            Balance.Size = new Size(61, 27);
-            Balance.TabIndex = 6;
-            Balance.Text = "label1";
+            StaffMenuButton.Location = new Point(27, 326);
+            StaffMenuButton.Name = "StaffMenuButton";
+            StaffMenuButton.Size = new Size(136, 59);
+            StaffMenuButton.TabIndex = 8;
+            StaffMenuButton.Text = "Staff Menu";
+            StaffMenuButton.UseVisualStyleBackColor = true;
+            StaffMenuButton.Click += StaffMenuButton_Click;
             // 
             // MainMenu
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 488);
+            ClientSize = new Size(1077, 558);
             Controls.Add(MainMenuGroupBox);
             Name = "MainMenu";
             Text = "Main Menu";
@@ -122,5 +146,7 @@
         private Button ViewBetsButton;
         private GroupBox UsedGroupBox;
         private Label Balance;
+        private Button BetHistoryButton;
+        private Button StaffMenuButton;
     }
 }

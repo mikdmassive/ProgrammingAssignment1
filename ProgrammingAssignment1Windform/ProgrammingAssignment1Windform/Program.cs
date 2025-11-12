@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace ProgrammingAssignment1Windform
@@ -49,6 +50,7 @@ namespace ProgrammingAssignment1Windform
                 List<string> data = File.ReadAllLines(matchesfile).ToList();
                 foreach (string potentialmatch in data)
                 {
+                    Debug.WriteLine(potentialmatch);
                     if (potentialmatch.Length > 0)
                     {
                         Matches.Add(JsonSerializer.Deserialize<Match>(potentialmatch));
@@ -69,6 +71,7 @@ namespace ProgrammingAssignment1Windform
         }
         public static void Login(User user)
         {
+            Debug.WriteLine(Matches.Count);
             Form mainMenu = new MainMenu(user,Matches);//(user, Users, Matches));
             mainMenu.Show();
             

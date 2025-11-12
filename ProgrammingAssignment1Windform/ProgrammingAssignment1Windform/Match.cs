@@ -18,6 +18,10 @@ public class Match
     }
     public string FormatMatch()
     {
-        return ($"{team1} VS {team2} = {(isFinished ? $"{score1} - {score2}" : "Awaiting Kickoff")}");
+        return ($"{FormatMatchNoScore()} = {(isFinished ? $"{score1} - {score2}" : "Awaiting Kickoff")}");
+    }
+    public string FormatMatchNoScore()
+    {
+        return ($"{team1} VS {team2}");
     }
 }

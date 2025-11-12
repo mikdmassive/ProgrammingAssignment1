@@ -156,7 +156,7 @@ namespace ProgrammingAssignment1Windform
                 }
                 if (theuser != null)//check password
                 {
-                    if(theuser.password == LoginPasswordTextBox.Text)//success
+                    if (theuser.password == LoginPasswordTextBox.Text)//success
                     {
                         //todo : login
                         this.Hide();
@@ -166,9 +166,14 @@ namespace ProgrammingAssignment1Windform
                     {
                         LoginPasswordTextBox.Text = "";
                     }
-                
+
                 }
             }
+        }
+
+        private void LoginPasswordTextBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
