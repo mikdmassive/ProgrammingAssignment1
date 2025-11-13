@@ -369,5 +369,10 @@ namespace ProgrammingAssignment1Windform
         {
             Program.LogOut();
         }
+
+        private void DepositButton_Click(object sender, EventArgs e)
+        {
+            Program.OpenDepositForm();
+        }
     }
 }

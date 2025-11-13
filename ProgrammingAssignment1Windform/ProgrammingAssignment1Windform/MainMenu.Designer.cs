@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             MainMenuGroupBox = new GroupBox();
+            LogoutButton = new Button();
             StaffMenuButton = new Button();
             BetHistoryButton = new Button();
             Balance = new Label();
@@ -36,12 +37,13 @@
             PlaceBets = new Button();
             ViewMatchesButton = new Button();
             ViewBetsButton = new Button();
-            LogoutButton = new Button();
+            DepositButton = new Button();
             MainMenuGroupBox.SuspendLayout();
             SuspendLayout();
             // 
             // MainMenuGroupBox
             // 
+            MainMenuGroupBox.Controls.Add(DepositButton);
             MainMenuGroupBox.Controls.Add(LogoutButton);
             MainMenuGroupBox.Controls.Add(StaffMenuButton);
             MainMenuGroupBox.Controls.Add(BetHistoryButton);
@@ -50,21 +52,28 @@
             MainMenuGroupBox.Controls.Add(PlaceBets);
             MainMenuGroupBox.Controls.Add(ViewMatchesButton);
             MainMenuGroupBox.Controls.Add(ViewBetsButton);
-            MainMenuGroupBox.Location = new Point(27, 16);
-            MainMenuGroupBox.Margin = new Padding(2);
+            MainMenuGroupBox.Location = new Point(39, 27);
             MainMenuGroupBox.Name = "MainMenuGroupBox";
-            MainMenuGroupBox.Padding = new Padding(2);
-            MainMenuGroupBox.Size = new Size(707, 538);
+            MainMenuGroupBox.Size = new Size(1010, 897);
             MainMenuGroupBox.TabIndex = 0;
             MainMenuGroupBox.TabStop = false;
             MainMenuGroupBox.Text = "groupBox1";
             // 
+            // LogoutButton
+            // 
+            LogoutButton.Location = new Point(27, 512);
+            LogoutButton.Name = "LogoutButton";
+            LogoutButton.Size = new Size(136, 58);
+            LogoutButton.TabIndex = 9;
+            LogoutButton.Text = "Log Out";
+            LogoutButton.UseVisualStyleBackColor = true;
+            LogoutButton.Click += LogoutButton_Click;
+            // 
             // StaffMenuButton
             // 
-            StaffMenuButton.Location = new Point(19, 214);
-            StaffMenuButton.Margin = new Padding(2);
+            StaffMenuButton.Location = new Point(27, 357);
             StaffMenuButton.Name = "StaffMenuButton";
-            StaffMenuButton.Size = new Size(95, 35);
+            StaffMenuButton.Size = new Size(136, 58);
             StaffMenuButton.TabIndex = 8;
             StaffMenuButton.Text = "Staff Menu";
             StaffMenuButton.UseVisualStyleBackColor = true;
@@ -72,10 +81,9 @@
             // 
             // BetHistoryButton
             // 
-            BetHistoryButton.Location = new Point(19, 149);
-            BetHistoryButton.Margin = new Padding(2);
+            BetHistoryButton.Location = new Point(27, 248);
             BetHistoryButton.Name = "BetHistoryButton";
-            BetHistoryButton.Size = new Size(95, 45);
+            BetHistoryButton.Size = new Size(136, 75);
             BetHistoryButton.TabIndex = 7;
             BetHistoryButton.Text = "View Bet History";
             BetHistoryButton.UseVisualStyleBackColor = true;
@@ -85,30 +93,26 @@
             // 
             Balance.AutoSize = true;
             Balance.BorderStyle = BorderStyle.FixedSingle;
-            Balance.Location = new Point(19, 27);
-            Balance.Margin = new Padding(2, 0, 2, 0);
+            Balance.Location = new Point(27, 45);
             Balance.Name = "Balance";
-            Balance.Size = new Size(40, 17);
+            Balance.Size = new Size(61, 27);
             Balance.TabIndex = 6;
             Balance.Text = "label1";
             // 
             // UsedGroupBox
             // 
-            UsedGroupBox.Location = new Point(179, 11);
-            UsedGroupBox.Margin = new Padding(2);
+            UsedGroupBox.Location = new Point(256, 18);
             UsedGroupBox.Name = "UsedGroupBox";
-            UsedGroupBox.Padding = new Padding(2);
-            UsedGroupBox.Size = new Size(519, 503);
+            UsedGroupBox.Size = new Size(741, 838);
             UsedGroupBox.TabIndex = 5;
             UsedGroupBox.TabStop = false;
             UsedGroupBox.Enter += groupBox1_Enter;
             // 
             // PlaceBets
             // 
-            PlaceBets.Location = new Point(19, 118);
-            PlaceBets.Margin = new Padding(2);
+            PlaceBets.Location = new Point(27, 197);
             PlaceBets.Name = "PlaceBets";
-            PlaceBets.Size = new Size(95, 20);
+            PlaceBets.Size = new Size(136, 33);
             PlaceBets.TabIndex = 2;
             PlaceBets.Text = "Place Bets";
             PlaceBets.UseVisualStyleBackColor = true;
@@ -116,10 +120,9 @@
             // 
             // ViewMatchesButton
             // 
-            ViewMatchesButton.Location = new Point(19, 84);
-            ViewMatchesButton.Margin = new Padding(2);
+            ViewMatchesButton.Location = new Point(27, 140);
             ViewMatchesButton.Name = "ViewMatchesButton";
-            ViewMatchesButton.Size = new Size(95, 20);
+            ViewMatchesButton.Size = new Size(136, 33);
             ViewMatchesButton.TabIndex = 1;
             ViewMatchesButton.Text = "View Matches";
             ViewMatchesButton.UseVisualStyleBackColor = true;
@@ -127,33 +130,30 @@
             // 
             // ViewBetsButton
             // 
-            ViewBetsButton.Location = new Point(19, 51);
-            ViewBetsButton.Margin = new Padding(2);
+            ViewBetsButton.Location = new Point(27, 85);
             ViewBetsButton.Name = "ViewBetsButton";
-            ViewBetsButton.Size = new Size(95, 20);
+            ViewBetsButton.Size = new Size(136, 33);
             ViewBetsButton.TabIndex = 0;
             ViewBetsButton.Text = "View Bets";
             ViewBetsButton.UseVisualStyleBackColor = true;
             ViewBetsButton.Click += ViewBetsButton_Click;
             // 
-            // LogoutButton
+            // DepositButton
             // 
-            LogoutButton.Location = new Point(19, 262);
-            LogoutButton.Margin = new Padding(2);
-            LogoutButton.Name = "LogoutButton";
-            LogoutButton.Size = new Size(95, 35);
-            LogoutButton.TabIndex = 9;
-            LogoutButton.Text = "Log Out";
-            LogoutButton.UseVisualStyleBackColor = true;
-            LogoutButton.Click += LogoutButton_Click;
+            DepositButton.Location = new Point(27, 434);
+            DepositButton.Name = "DepositButton";
+            DepositButton.Size = new Size(136, 58);
+            DepositButton.TabIndex = 10;
+            DepositButton.Text = "Deposit";
+            DepositButton.UseVisualStyleBackColor = true;
+            DepositButton.Click += DepositButton_Click;
             // 
             // MainMenu
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(779, 565);
+            ClientSize = new Size(1113, 942);
             Controls.Add(MainMenuGroupBox);
-            Margin = new Padding(2);
             Name = "MainMenu";
             Text = "Main Menu";
             Load += MainMenu_Load;
@@ -173,5 +173,6 @@
         private Button BetHistoryButton;
         private Button StaffMenuButton;
         private Button LogoutButton;
+        private Button DepositButton;
     }
 }

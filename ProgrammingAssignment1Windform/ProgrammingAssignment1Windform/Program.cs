@@ -35,6 +35,7 @@ namespace ProgrammingAssignment1Windform
         static LoginScreen loginScreen = null;
 
         static MainMenu mainMenu = null;
+        static DepositForm depositForm = null;
         static void Initialise()
         {
             Users.Clear();
@@ -91,6 +92,14 @@ namespace ProgrammingAssignment1Windform
             }
             return matchPointer;
         }
+        private static void UpdateAllScreens()
+        {
+            mainMenu.UpdateStats(user, Matches);
+            if (depositForm != null)
+            {
+                depositForm.UpdateStats(user);
+            }
+        }
         public static void CreateAccount(string username, string fname, string lname, string password)
         {
             User newuser = new User(username, fname, lname, password);
@@ -103,7 +112,7 @@ namespace ProgrammingAssignment1Windform
             Match match = new Match($"MATCH_{Matches.Count}", team1, team2);
             Matches.Add(match);
             SaveAllMatches();
-            mainMenu.UpdateStats(user,Matches);
+            UpdateAllScreens();
         }
        
         public static void PlaceBet(Match selectedMatch, int predictedScore1, int predictedScore2, float wagerAmount)
@@ -112,7 +121,7 @@ namespace ProgrammingAssignment1Windform
             Bet bet = new Bet(selectedMatch.matchID, predictedScore1, predictedScore2, wagerAmount);
             user.Bets.Add(bet);
             SaveAllUsers();
-            mainMenu.UpdateStats(user, Matches);
+            UpdateAllScreens();
         }
         public static void PayoutBetsOnMatch(int score1,int score2,string matchid)
         {
@@ -193,10 +202,33 @@ namespace ProgrammingAssignment1Windform
             mainMenu.Show();
             
         }
+        public static void Deposit(float amount)
+        {
+            if (user != null)
+            {
+                user.balance += amount;
+                SaveAllUsers();
+                UpdateAllScreens();
+            }
+         
+        }
+        public static void OpenDepositForm()
+        {
+            if (depositForm == null)
+            {
+                depositForm = new DepositForm(user);
+            }
+            depositForm.Show();
+        }
         public static void LogOut()
         {
             user = null;
             mainMenu.Hide();
+            if (depositForm != null)
+            {
+                depositForm.Hide();
+    
+            }
             loginScreen = new LoginScreen(Users);
             loginScreen.Show();
         }
