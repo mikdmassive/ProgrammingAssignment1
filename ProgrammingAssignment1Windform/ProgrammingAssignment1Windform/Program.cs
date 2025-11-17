@@ -214,11 +214,13 @@ namespace ProgrammingAssignment1Windform
         }
         public static void OpenDepositForm()
         {
-            if (depositForm == null)
+
+            if (depositForm == null|| !depositForm.Visible)
             {
                 depositForm = new DepositForm(user);
+                depositForm.Show();
             }
-            depositForm.Show();
+          
         }
         public static void LogOut()
         {
@@ -227,7 +229,7 @@ namespace ProgrammingAssignment1Windform
             if (depositForm != null)
             {
                 depositForm.Hide();
-    
+                depositForm = null;
             }
             loginScreen = new LoginScreen(Users);
             loginScreen.Show();
